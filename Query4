@@ -1,0 +1,18 @@
+WITH t1 AS (
+	SELECT
+		c.last_name AS last_name,
+		SUM(p.amount) AS ttl_amt
+	FROM payment p
+	JOIN customer c ON  c.customer_id = p.customer_id
+	GROUP BY 1
+	ORDER by 2 desc
+	LIMIT 10)
+
+SELECT
+	DISTINCT c.first_name || ' ' || c.last_name AS full_name,
+	DATE_TRUNC('month', p.payment_date) AS rental_month,
+    SUM(p.amount) OVER (PARTITION BY DATE_TRUNC('month', p.payment_date), c.last_name)
+FROM customer c
+JOIN t1 ON t1.last_name = c.last_name
+JOIN payment p ON p.customer_id = c.customer_id
+ORDER BY 1, 2;

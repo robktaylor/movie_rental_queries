@@ -1,0 +1,19 @@
+WITH t1 AS (
+
+ SELECT
+	f.title AS title,
+	c.name AS category_name,
+	f.rental_duration AS duration_of_rental,
+    	NTILE(4) OVER (ORDER BY f.rental_duration) AS quartile
+FROM film f
+JOIN film_category fc ON fc.film_id = f.film_id
+JOIN category c ON c.category_id = fc.category_id
+WHERE c.name IN ('Animation', 'Children', 'Classics', 'Comedy', 'Family', 'Music'))
+
+SELECT
+   DISTINCT category_name,
+   quartile,
+   count(*) as ttl_count
+FROM t1
+GROUP BY 1, 2
+ORDER BY 1, 2;
